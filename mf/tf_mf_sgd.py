@@ -7,7 +7,7 @@ from sklearn.externals import joblib
 
 class MatrixFactorizationSGD(tf.keras.Model):
 
-    def __init__(self, n_users, n_items, factor_dim=16, *args, **kwargs):
+    def __init__(self, n_users, n_items, factor_dim=16, reg_param=0.1, *args, **kwargs):
         super(MatrixFactorizationSGD, self).__init__(*args, **kwargs)
         self.user_factor = tf.keras.layers.Embedding(n_users, factor_dim, input_length=1)
         self.item_factor = tf.keras.layers.Embedding(n_items, factor_dim, input_length=1)
@@ -17,19 +17,21 @@ class MatrixFactorizationSGD(tf.keras.Model):
         item_vec = self.item_factor(item_idx)
         return tf.reduce_sum(tf.multiply(item_vec, user_vec), 1)
 
-    def loss(self, user_idx, item_idx, ratings, reg_param=0.1):
+    def loss(self, user_idx, item_idx, ratings):
         loss = tf.square(tf.subtract(ratings, self.call(user_idx, item_idx)))
-        user_reg = tf.multiply(reg_param, tf.sqrt(tf.reduce_sum(tf.square(self.user_factor(user_idx)), 1)))
-        item_reg = tf.multiply(reg_param, tf.sqrt(tf.reduce_sum(tf.square(self.item_factor(item_idx)), 1)))
+        user_reg = tf.multiply(self.reg_param, tf.sqrt(tf.reduce_sum(tf.square(self.user_factor(user_idx)), 1)))
+        item_reg = tf.multiply(self.reg_param, tf.sqrt(tf.reduce_sum(tf.square(self.item_factor(item_idx)), 1)))
         return tf.add(loss, user_reg, item_reg)
 
 
-train_dataset = tf.data.experimental.CsvDataset(['train.csv'], [tf.int32, tf.int32, tf.float32], header=False) \
-                    .shuffle(128) \
-                    .batch(128)
-test_dataset = tf.data.experimental.CsvDataset(['test.csv'], [tf.int32, tf.int32, tf.float32], header=False) \
-                    .shuffle(128) \
-                    .batch(128)
+train_dataset = tf.data.experimental.CsvDataset(
+    ['train.csv'],
+    [tf.int32, tf.int32, tf.float32],
+    header=False).shuffle(128).batch(128)
+test_dataset = tf.data.experimental.CsvDataset(
+    ['test.csv'],
+    [tf.int32, tf.int32, tf.float32],
+    header=False).shuffle(128).batch(128)
 mf = MatrixFactorizationSGD(611, 193610)
 optimizer = tf.keras.optimizers.SGD(lr=0.01)
 
