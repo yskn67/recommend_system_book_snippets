@@ -28,8 +28,8 @@ train_dataset = tf.data.experimental.CsvDataset(['train.csv'], [tf.int32, tf.int
                     .shuffle(128) \
                     .batch(128)
 test_dataset = tf.data.experimental.CsvDataset(['test.csv'], [tf.int32, tf.int32, tf.float32], header=False) \
-                    .shuffle(32) \
-                    .batch(32)
+                    .shuffle(128) \
+                    .batch(128)
 mf = MatrixFactorizationSGD(611, 193610)
 optimizer = tf.keras.optimizers.SGD(lr=0.01)
 
