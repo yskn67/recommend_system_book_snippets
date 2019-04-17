@@ -9,6 +9,7 @@ class MatrixFactorizationSGD(tf.keras.Model):
 
     def __init__(self, n_users, n_items, factor_dim=16, reg_param=0.1, *args, **kwargs):
         super(MatrixFactorizationSGD, self).__init__(*args, **kwargs)
+        self.reg_param = reg_param
         self.user_factor = tf.keras.layers.Embedding(n_users, factor_dim, input_length=1)
         self.item_factor = tf.keras.layers.Embedding(n_items, factor_dim, input_length=1)
 
