@@ -2,3 +2,7 @@ ml-20m*
 ml-latest-small*
 train.csv
 test.csv
+mf_als_test_loss.pkl
+mf_als_train_loss.pkl
+mf_sgd_test_loss.pkl
+mf_sgd_train_loss.pkl
